@@ -1,4 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Renderer2 } from '@angular/core';
+import { SettingsService } from '../services/service.index';
+
+declare function init_plugins();
 
 @Component({
   selector: 'app-pages',
@@ -7,9 +10,12 @@ import { Component, OnInit } from '@angular/core';
 })
 export class PagesComponent implements OnInit {
 
-  constructor() { }
+  constructor(public _ajustes: SettingsService, private renderer: Renderer2) {
+    this.renderer.setAttribute(document.getElementById('theme'), 'href', this._ajustes.ajustes.temaUrl);
+  }
 
   ngOnInit() {
+    init_plugins();
   }
 
 }
