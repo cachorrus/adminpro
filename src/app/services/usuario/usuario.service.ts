@@ -1,10 +1,11 @@
 import { map } from 'rxjs/operators';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Usuario } from '../../../models/usuario.model';
 import { URL_SERVICIOS } from '../../config/config';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
+import { SubirArchivoService } from '../subir-archivo/subir-archivo.service';
 
 @Injectable()
 export class UsuarioService {
@@ -14,7 +15,8 @@ export class UsuarioService {
 
   constructor(
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private _subirArchivoService: SubirArchivoService
   ) {
     this.cargarStorage();
   }
@@ -37,13 +39,13 @@ export class UsuarioService {
     }
   }
 
-  guardarStorage(resp: any) {
-    localStorage.setItem('id', resp.id);
-    localStorage.setItem('token', resp.token);
-    localStorage.setItem('usuario', JSON.stringify(resp.usuario));
+  guardarStorage(id: string, token: string, usuario: Usuario) {
+    localStorage.setItem('id', id);
+    localStorage.setItem('token', token);
+    localStorage.setItem('usuario', JSON.stringify(usuario));
 
-    this.usuario = resp.usuario;
-    this.token = resp.token;
+    this.usuario = usuario;
+    this.token = token;
   }
 
   logOut() {
@@ -61,7 +63,7 @@ export class UsuarioService {
     return this.http.post(url, { token })
               .pipe(
                 map( (resp: any) => {
-                  this.guardarStorage(resp);
+                  this.guardarStorage(resp.id, resp.token, resp.usuario);
                   return true;
                 })
               );
@@ -80,7 +82,7 @@ export class UsuarioService {
     return this.http.post(url, usuario)
               .pipe(
                 map( (resp: any) => {
-                  this.guardarStorage(resp);
+                  this.guardarStorage(resp.id, resp.token, resp.usuario);
                   return true;
                 })
               );
@@ -95,6 +97,38 @@ export class UsuarioService {
                   Swal('Usuario creado', usuario.email, 'success');
                   return resp.usuario;
               }));
+  }
+
+  actualizarUsuario( usuario: Usuario) {
+    const url = URL_SERVICIOS + '/usuario/' + usuario._id;
+
+    return this.http.put(url, usuario, {headers: this.requestHeaders()})
+              .pipe(
+                map( (resp: any) => {
+                  this.guardarStorage(resp._id, this.token, resp.usuario);
+                  Swal('Usuario actualizado', usuario.nombre, 'success');
+                  return true;
+                })
+              );
+  }
+
+  cambiarImagen( archivo: File, id: string) {
+    this._subirArchivoService.fileUpload(archivo, 'usuarios', id)
+                .subscribe( (resp: any) => {
+                  this.usuario.img = resp.usuarios.img;
+                  this.guardarStorage(this.usuario._id, this.token, this.usuario);
+                  Swal('Imagen actualizado', this.usuario.nombre, 'success');
+                  return true;
+                });
+  }
+
+  private requestHeaders() {
+    const headers = new HttpHeaders({
+      'Authorization': localStorage.getItem('token')
+    });
+
+    return headers;
+
   }
 
 }
