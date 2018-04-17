@@ -6,6 +6,8 @@ import { URL_SERVICIOS } from '../../config/config';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
 import { SubirArchivoService } from '../subir-archivo/subir-archivo.service';
+import { pipeDef } from '@angular/core/src/view/provider';
+import { Pipe } from '@angular/core/src/metadata/directives';
 
 @Injectable()
 export class UsuarioService {
@@ -105,8 +107,13 @@ export class UsuarioService {
     return this.http.put(url, usuario, {headers: this.requestHeaders()})
               .pipe(
                 map( (resp: any) => {
-                  this.guardarStorage(resp._id, this.token, resp.usuario);
+
+                  if ( usuario._id === this.usuario._id) {
+                    this.guardarStorage(resp._id, this.token, resp.usuario);
+                  }
+
                   Swal('Usuario actualizado', usuario.nombre, 'success');
+
                   return true;
                 })
               );
@@ -129,6 +136,40 @@ export class UsuarioService {
 
     return headers;
 
+  }
+
+  cargarUsuarios(desde: number = 0) {
+    const url = URL_SERVICIOS + '/usuario?desde=' + desde;
+
+    return this.http.get(url, {headers: this.requestHeaders()} );
+  }
+
+  buscarUsuario(search: string) {
+    const url = URL_SERVICIOS + '/busqueda/coleccion/usuarios/' + search;
+
+    return this.http.get(url)
+            .pipe(
+              map( (resp: any) => {
+                return resp.usuarios;
+              })
+            );
+  }
+
+  borrarUsuario(id: string) {
+    const url = URL_SERVICIOS + '/usuario/' + id;
+
+    return this.http.delete(url, { headers: this.requestHeaders()})
+              .pipe(
+                map( (resp: any) => {
+                  Swal(
+                    '¡Eliminado!',
+                    'Usuario ' + resp.usuario.nombre +  ' eliminado',
+                    'success'
+                  );
+
+                  return true;
+                })
+              );
   }
 
 }

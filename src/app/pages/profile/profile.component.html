@@ -38,10 +38,11 @@
         <h4 class="card-title">Imagen de usuario</h4>   
         <hr>     
         <form class="form p-t-20">
-            <img *ngIf="!imagenTemp" [src]="usuario.img | imagenes" class="card-img" >
-            <img *ngIf="imagenTemp" [src]="imagenTemp" class="card-img" >
-          <div class="form-group">
-            <label for="fileImagen">Imagen</label>
+            <img *ngIf="!imagenTemp" [src]="usuario.img | imagenes" class="w150" >
+            <img *ngIf="imagenTemp" [src]="imagenTemp" class="w150" >
+            <br>
+            <br>
+          <div class="form-group">           
             <div class="input-group">
               <div class="input-group-addon">
                 <i class="ti-image"></i>
