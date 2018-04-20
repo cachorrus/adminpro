@@ -26,7 +26,7 @@ export class ImagenesPipe implements PipeTransform {
         break;
 
       case 'medico':
-        url += '/usuarios/' + img;
+        url += '/medicos/' + img;
         break;
 
       case 'hospital':

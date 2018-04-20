@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule} from '@angular/forms';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 // Rutas child
 import { PAGE_ROUTES } from './pages.routing';
@@ -27,6 +28,9 @@ import { RxjsComponent } from './rxjs/rxjs.component';
 import { ProfileComponent } from './profile/profile.component';
 import { UsuariosComponent } from './usuarios/usuarios.component';
 import { ModalUploadComponent } from '../components/modal-upload/modal-upload.component';
+import { HospitalesComponent } from './hospitales/hospitales.component';
+import { MedicosComponent } from './medicos/medicos.component';
+import { MedicoComponent } from './medicos/medico.component';
 
 @NgModule({
   imports: [
@@ -35,7 +39,8 @@ import { ModalUploadComponent } from '../components/modal-upload/modal-upload.co
     PAGE_ROUTES,
     FormsModule,
     ChartsModule,
-    PipesModule
+    PipesModule,
+    NgSelectModule
   ],
   declarations: [
     DashboardComponent,
@@ -49,7 +54,10 @@ import { ModalUploadComponent } from '../components/modal-upload/modal-upload.co
     RxjsComponent,
     ProfileComponent,
     UsuariosComponent,
-    ModalUploadComponent
+    ModalUploadComponent,
+    HospitalesComponent,
+    MedicosComponent,
+    MedicoComponent
   ],
   exports: [
     DashboardComponent,
