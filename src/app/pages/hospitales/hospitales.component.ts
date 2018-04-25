@@ -1,30 +1,46 @@
-import { Component, OnInit } from '@angular/core';
-import { HospitalService } from '../../services/service.index';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { HospitalService, DataService } from '../../services/service.index';
 import { Hospital } from '../../../models/hospital.model';
 import Swal from 'sweetalert2';
 import { ModalUploadService } from '../../components/modal-upload/modal-upload.service';
+import { takeWhile } from 'rxjs/operators';
 
 @Component({
   selector: 'app-hospitales',
   templateUrl: './hospitales.component.html',
   styles: []
 })
-export class HospitalesComponent implements OnInit {
+export class HospitalesComponent implements OnInit, OnDestroy {
 
   hospitales: Hospital[];
   desde: number = 0;
   totalRegistros: number = 0;
   cargando: boolean = false;
+  alive: boolean = true;
+
   constructor(
     public _hospitalesService: HospitalService,
-    public _modalUploadService: ModalUploadService
+    public _modalUploadService: ModalUploadService,
+    private _dataService: DataService
   ) { }
 
   ngOnInit() {
-    this.cargarHospitales();
+    // this.cargarHospitales();
 
     this._modalUploadService.notificacion
+          .pipe(takeWhile(() => this.alive ))
           .subscribe(resp => this.cargarHospitales());
+
+
+    this._dataService.currentMessage
+        .pipe(takeWhile(() => this.alive ))
+        .subscribe(message => {
+          this.buscarHospital(message);
+    });
+  }
+
+  ngOnDestroy() {
+    this.alive = false;
   }
 
   cargarHospitales() {

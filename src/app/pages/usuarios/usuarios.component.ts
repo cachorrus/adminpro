@@ -1,30 +1,46 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Usuario } from '../../../models/usuario.model';
-import { UsuarioService } from '../../services/service.index';
+import { UsuarioService, DataService } from '../../services/service.index';
 import { ModalUploadService } from '../../components/modal-upload/modal-upload.service';
 import Swal from 'sweetalert2';
+import { takeWhile } from 'rxjs/operators/takeWhile';
 
 @Component({
   selector: 'app-usuarios',
   templateUrl: './usuarios.component.html',
   styles: []
 })
-export class UsuariosComponent implements OnInit {
+export class UsuariosComponent implements OnInit, OnDestroy {
 
   usuarios: Usuario[] = [];
   desde: number = 0;
   totalRegistros: number = 0;
   cargando: boolean = false;
+  alive: boolean = true;
 
   constructor(
     private _usuarioService: UsuarioService,
-    private _modalUploadService: ModalUploadService) { }
+    private _modalUploadService: ModalUploadService,
+    private _dataService: DataService
+  ) { }
 
   ngOnInit() {
-    this.cargarUsuarios();
+    /*this.cargarUsuarios();*/
 
     this._modalUploadService.notificacion
+          .pipe(takeWhile(() => this.alive))
           .subscribe(resp => this.cargarUsuarios());
+
+    this._dataService.currentMessage
+          .pipe(takeWhile(() => this.alive ))
+          .subscribe(message => {
+            this.buscarUsuario(message);
+    });
+
+  }
+
+  ngOnDestroy() {
+    this.alive = false;
   }
 
   mostrarModal(id: string) {
@@ -60,7 +76,6 @@ export class UsuariosComponent implements OnInit {
   }
 
   buscarUsuario(search: string) {
-
     if (search.length <= 0) {
       this.cargarUsuarios();
       return;
