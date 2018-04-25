@@ -68,6 +68,26 @@ export class UsuarioService {
     // window.location.href = '#/login';
   }
 
+  renuevaToken() {
+    const url = URL_SERVICIOS + '/login/renuevatoken';
+
+    return this.http.get(url, { headers: this.requestHeaders() })
+            .pipe(
+              catchError(err => {
+                this.router.navigate(['/login']);
+                return this.handleError(err);
+              }),
+              map( (resp: any) => {
+
+                this.token = resp.token;
+                localStorage.setItem('token', this.token);
+                console.log('token renovado');
+
+                return true;
+              })
+            );
+  }
+
   loginGoogle(token: string) {
     const url = URL_SERVICIOS + '/login/google';
 

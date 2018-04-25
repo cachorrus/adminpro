@@ -1,3 +1,4 @@
+export { VerificaTokenGuard } from './guards/verifica-token.guard';
 export { AdminGuard } from './guards/admin.guard';
 export { LoginGuard } from './guards/login.guard';
 
